@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>We'll Be Back Soon</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(145deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            text-align: center;
+            padding: 10% 5%;
+            margin: 0;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 20px;
+        }
+        .email {
+            background: rgba(255,255,255,0.1);
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #fff;
+            text-decoration: none;
+        }
+        .email:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        footer {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>We're Updating Our Servers</h1>
+    <p>Our website is temporarily offline while we complete a system migration.  
+       We’ll be back shortly with faster and more reliable performance.</p>
+
+    <p>If you need assistance in the meantime, you can reach us at:  
+       <span id="email-container"></span>
+    </p>
+
+    <footer>© <script>document.write(new Date().getFullYear());</script> Fare Bros</footer>
+
+    <script>
+        // Build the email dynamically to avoid spam bots scraping it
+        const user = "aaron";
+        const domain = "farebros";
+        const tld = "com";
+        const email = `${user}@${domain}.${tld}`;
+
+        const link = document.createElement("a");
+        link.href = `mailto:${email}`;
+        link.className = "email";
+        link.textContent = email;
+
+        document.getElementById("email-container").appendChild(link);
+    </script>
+</body>
+</html>
