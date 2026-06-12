@@ -1,72 +1,500 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>We'll Be Back Soon</title>
-    <style>
-        body {
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(145deg, #0f2027, #203a43, #2c5364);
-            color: #fff;
-            text-align: center;
-            padding: 10% 5%;
-            margin: 0;
-        }
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        p {
-            font-size: 1.2rem;
-            max-width: 600px;
-            margin: 0 auto 20px;
-        }
-        .email {
-            background: rgba(255,255,255,0.1);
-            display: inline-block;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            color: #fff;
-            text-decoration: none;
-        }
-        .email:hover {
-            background: rgba(255,255,255,0.25);
-        }
-        footer {
-            position: absolute;
-            bottom: 20px;
-            width: 100%;
-            font-size: 0.9rem;
-            color: #ccc;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fare Brothers | Maintenance</title>
+
+  <style>
+    :root {
+      --bg: #07111f;
+      --bg-soft: #0d1b2f;
+      --card: rgba(13, 27, 47, 0.88);
+      --blue: #2f8cff;
+      --blue-soft: #78b7ff;
+      --text: #f4f8ff;
+      --muted: #a9bad3;
+      --border: rgba(120, 183, 255, 0.22);
+      --danger: #ff6b8a;
+      --success: #79ffc6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(47, 140, 255, 0.22), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(47, 140, 255, 0.14), transparent 38%),
+        linear-gradient(135deg, #050b14 0%, var(--bg) 55%, #0b1829 100%);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 760px;
+      text-align: center;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 46px 34px;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.42);
+      backdrop-filter: blur(10px);
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 74px;
+      height: 74px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, var(--blue), #1456ad);
+      box-shadow: 0 0 34px rgba(47, 140, 255, 0.42);
+      margin-bottom: 22px;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .eyebrow {
+      color: var(--blue-soft);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      font-size: clamp(32px, 5vw, 52px);
+      line-height: 1.05;
+      margin-bottom: 18px;
+      letter-spacing: -1.5px;
+    }
+
+    p {
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.65;
+      max-width: 620px;
+      margin: 0 auto 26px;
+    }
+
+    .notice {
+      border-top: 1px solid var(--border);
+      margin-top: 28px;
+      padding-top: 24px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    a {
+      color: var(--blue-soft);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .status {
+      appearance: none;
+      border: 1px solid rgba(120, 183, 255, 0.25);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(47, 140, 255, 0.12);
+      color: var(--blue-soft);
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      margin-top: 8px;
+      cursor: pointer;
+      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .status:hover,
+    .status:focus-visible {
+      background: rgba(47, 140, 255, 0.18);
+      border-color: rgba(120, 183, 255, 0.55);
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--blue-soft);
+      box-shadow: 0 0 14px var(--blue-soft);
+    }
+
+    footer {
+      margin-top: 22px;
+      color: rgba(169, 186, 211, 0.7);
+      font-size: 13px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 7, 14, 0.72);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      z-index: 1000;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 520px;
+      background:
+        radial-gradient(circle at top left, rgba(47, 140, 255, 0.22), transparent 42%),
+        rgba(13, 27, 47, 0.96);
+      border: 1px solid rgba(120, 183, 255, 0.28);
+      border-radius: 22px;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
+      text-align: left;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 22px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .modal-close {
+      appearance: none;
+      width: 38px;
+      height: 38px;
+      border: 1px solid rgba(120, 183, 255, 0.22);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .modal-close:hover,
+    .modal-close:focus-visible {
+      color: var(--text);
+      border-color: rgba(120, 183, 255, 0.48);
+      outline: none;
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .stage-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 13px;
+      border-radius: 999px;
+      background: rgba(47, 140, 255, 0.12);
+      border: 1px solid rgba(120, 183, 255, 0.24);
+      color: var(--blue-soft);
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
+
+    .stage-title {
+      font-size: clamp(24px, 4vw, 34px);
+      line-height: 1.15;
+      letter-spacing: -0.8px;
+      margin-bottom: 12px;
+    }
+
+    .stage-desc {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.6;
+      margin: 0 0 20px;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(120, 183, 255, 0.16);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #2f8cff, #78b7ff);
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+
+    .modal-small {
+      color: rgba(169, 186, 211, 0.74);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .modal-error {
+      color: var(--danger);
+    }
+
+    @media (max-width: 520px) {
+      .card {
+        padding: 36px 22px;
+      }
+
+      p {
+        font-size: 16px;
+      }
+
+      .modal-header,
+      .modal-body {
+        padding: 20px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-    <h1>We're Updating Our Servers</h1>
-    <p>Our website is temporarily offline while we complete a system migration.  
-       We’ll be back shortly with faster and more reliable performance.</p>
+  <main class="wrap">
+    <section class="card">
+      <div class="logo">FB</div>
 
-    <p>If you need assistance in the meantime, you can reach us at:  
-       <span id="email-container"></span>
-    </p>
+      <div class="eyebrow">Temporary Maintenance</div>
 
-    <footer>© <script>document.write(new Date().getFullYear());</script> Fare Bros</footer>
+      <h1>Fare Brothers is currently offline</h1>
 
-    <script>
-        // Build the email dynamically to avoid spam bots scraping it
-        const user = "aaron";
-        const domain = "farebros";
-        const tld = "com";
-        const email = `${user}@${domain}.${tld}`;
+      <p>
+        The Fare Brothers website is currently down while we upgrade our electrical infrastructure.
+        We are hoping to have everything back up and running shortly.
+      </p>
 
-        const link = document.createElement("a");
-        link.href = `mailto:${email}`;
-        link.className = "email";
-        link.textContent = email;
+      <button class="status" id="openStatusModal" type="button" aria-haspopup="dialog">
+        <span class="dot"></span>
+        Upgrade In Progress
+      </button>
 
-        document.getElementById("email-container").appendChild(link);
-    </script>
+      <div class="notice">
+        Please check back again soon, or email us at
+        <a href="mailto:support@farebros.com">support@farebros.com</a>.
+      </div>
+    </section>
+
+    <footer>
+      &copy; 2026 Fare Brothers. All rights reserved.
+    </footer>
+  </main>
+
+  <div class="modal-backdrop" id="statusModal" role="dialog" aria-modal="true" aria-labelledby="statusModalTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="statusModalTitle">Upgrade Status</div>
+        <button class="modal-close" id="closeStatusModal" type="button" aria-label="Close status popup">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="stage-pill">
+          <span class="dot"></span>
+          <span id="stageLabel">Checking status...</span>
+        </div>
+
+        <h2 class="stage-title" id="stageTitle">Checking upgrade progress</h2>
+
+        <p class="stage-desc" id="stageDescription">
+          Pulling the latest status update now.
+        </p>
+
+        <div class="progress-track" aria-hidden="true">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div class="modal-small" id="statusUpdated">
+          Status refreshes from GitHub when this popup opens.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STATUS_FILE_URL = "https://raw.githubusercontent.com/Great-Lakes-IT/Website_down/New-Website_Down/status";
+
+    const statusMap = {
+      "0": {
+        label: "Upgrades in progress",
+        title: "Upgrades in progress",
+        description: "Maintenance has started. Our systems are offline while the infrastructure upgrade is underway.",
+        progress: 10
+      },
+      "1": {
+        label: "Stage 1",
+        title: "Stage 1: Site safely offline",
+        description: "The website is offline and protected while the electrical infrastructure work begins.",
+        progress: 25
+      },
+      "2": {
+        label: "Stage 2",
+        title: "Stage 2: Infrastructure work underway",
+        description: "Core upgrade work is in progress. Some services may remain unavailable while this stage is completed.",
+        progress: 45
+      },
+      "3": {
+        label: "Stage 3",
+        title: "Stage 3: Systems coming back online",
+        description: "Infrastructure work is wrapping up and systems are being brought back online carefully.",
+        progress: 65
+      },
+      "4": {
+        label: "Stage 4",
+        title: "Stage 4: Testing and verification",
+        description: "We are checking services, confirming stability, and making sure everything is ready before reopening the website.",
+        progress: 85
+      },
+      "5": {
+        label: "Final checks",
+        title: "Final checks",
+        description: "The upgrade is nearly complete. We are doing final checks before the website is restored.",
+        progress: 95
+      },
+      "6": {
+        label: "Complete",
+        title: "Upgrade complete",
+        description: "The upgrade is complete. The website should be returning shortly.",
+        progress: 100
+      }
+    };
+
+    const openButton = document.getElementById("openStatusModal");
+    const closeButton = document.getElementById("closeStatusModal");
+    const modal = document.getElementById("statusModal");
+    const stageLabel = document.getElementById("stageLabel");
+    const stageTitle = document.getElementById("stageTitle");
+    const stageDescription = document.getElementById("stageDescription");
+    const progressBar = document.getElementById("progressBar");
+    const statusUpdated = document.getElementById("statusUpdated");
+
+    function openModal() {
+      modal.classList.add("show");
+      document.body.style.overflow = "hidden";
+      closeButton.focus();
+      loadStatus();
+    }
+
+    function closeModal() {
+      modal.classList.remove("show");
+      document.body.style.overflow = "";
+      openButton.focus();
+    }
+
+    function setStatus(data, rawValue) {
+      stageLabel.textContent = data.label;
+      stageTitle.textContent = data.title;
+      stageDescription.textContent = data.description;
+      progressBar.style.width = data.progress + "%";
+      statusUpdated.classList.remove("modal-error");
+      statusUpdated.textContent = "Latest GitHub status value: " + rawValue + " • Updated " + new Date().toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit"
+      });
+    }
+
+    function setError() {
+      stageLabel.textContent = "Status unavailable";
+      stageTitle.textContent = "Unable to load live status";
+      stageDescription.textContent = "The upgrade is still in progress, but the live GitHub status file could not be reached right now.";
+      progressBar.style.width = "10%";
+      statusUpdated.classList.add("modal-error");
+      statusUpdated.textContent = "Try again in a moment.";
+    }
+
+    async function loadStatus() {
+      stageLabel.textContent = "Checking status...";
+      stageTitle.textContent = "Checking upgrade progress";
+      stageDescription.textContent = "Pulling the latest status update now.";
+      progressBar.style.width = "0%";
+      statusUpdated.classList.remove("modal-error");
+      statusUpdated.textContent = "Status refreshes from GitHub when this popup opens.";
+
+      try {
+        const response = await fetch(STATUS_FILE_URL + "?v=" + Date.now(), {
+          cache: "no-store"
+        });
+
+        if (!response.ok) {
+          throw new Error("Status file request failed.");
+        }
+
+        const rawStatus = (await response.text()).trim();
+
+        if (statusMap[rawStatus]) {
+          setStatus(statusMap[rawStatus], rawStatus);
+          return;
+        }
+
+        if (rawStatus.length > 0) {
+          setStatus({
+            label: "Custom update",
+            title: "Current upgrade update",
+            description: rawStatus,
+            progress: 50
+          }, rawStatus);
+          return;
+        }
+
+        setError();
+      } catch (error) {
+        setError();
+      }
+    }
+
+    openButton.addEventListener("click", openModal);
+    closeButton.addEventListener("click", closeModal);
+
+    modal.addEventListener("click", function (event) {
+      if (event.target === modal) {
+        closeModal();
+      }
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && modal.classList.contains("show")) {
+        closeModal();
+      }
+    });
+  </script>
 </body>
 </html>
