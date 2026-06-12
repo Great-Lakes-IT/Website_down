@@ -8,6 +8,7 @@
   <style>
     :root {
       --bg: #07111f;
+      --bg-soft: #0d1b2f;
       --card: rgba(13, 27, 47, 0.88);
       --blue: #2f8cff;
       --blue-soft: #78b7ff;
@@ -15,9 +16,14 @@
       --muted: #a9bad3;
       --border: rgba(120, 183, 255, 0.22);
       --danger: #ff6b8a;
+      --success: #79ffc6;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       min-height: 100vh;
@@ -33,7 +39,11 @@
       padding: 24px;
     }
 
-    .wrap { width: 100%; max-width: 760px; text-align: center; }
+    .wrap {
+      width: 100%;
+      max-width: 760px;
+      text-align: center;
+    }
 
     .card {
       background: var(--card);
@@ -91,8 +101,15 @@
       font-size: 15px;
     }
 
-    a { color: var(--blue-soft); font-weight: 700; text-decoration: none; }
-    a:hover { text-decoration: underline; }
+    a {
+      color: var(--blue-soft);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
 
     .status {
       appearance: none;
@@ -111,7 +128,8 @@
       transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
     }
 
-    .status:hover, .status:focus-visible {
+    .status:hover,
+    .status:focus-visible {
       background: rgba(47, 140, 255, 0.18);
       border-color: rgba(120, 183, 255, 0.55);
       transform: translateY(-1px);
@@ -126,7 +144,11 @@
       box-shadow: 0 0 14px var(--blue-soft);
     }
 
-    footer { margin-top: 22px; color: rgba(169, 186, 211, 0.7); font-size: 13px; }
+    footer {
+      margin-top: 22px;
+      color: rgba(169, 186, 211, 0.7);
+      font-size: 13px;
+    }
 
     .modal-backdrop {
       position: fixed;
@@ -139,7 +161,9 @@
       z-index: 1000;
     }
 
-    .modal-backdrop.show { display: flex; }
+    .modal-backdrop.show {
+      display: flex;
+    }
 
     .modal {
       width: 100%;
@@ -163,7 +187,11 @@
       border-bottom: 1px solid var(--border);
     }
 
-    .modal-title { font-size: 18px; font-weight: 800; color: var(--text); }
+    .modal-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+    }
 
     .modal-close {
       appearance: none;
@@ -178,13 +206,16 @@
       cursor: pointer;
     }
 
-    .modal-close:hover, .modal-close:focus-visible {
+    .modal-close:hover,
+    .modal-close:focus-visible {
       color: var(--text);
       border-color: rgba(120, 183, 255, 0.48);
       outline: none;
     }
 
-    .modal-body { padding: 24px; }
+    .modal-body {
+      padding: 24px;
+    }
 
     .stage-pill {
       display: inline-flex;
@@ -207,20 +238,54 @@
       margin-bottom: 12px;
     }
 
-    .stage-message { color: var(--muted); font-size: 16px; line-height: 1.65; margin: 0 0 18px; }
-
-    .last-updated {
-      border-top: 1px solid var(--border);
-      padding-top: 16px;
-      color: rgba(169, 186, 211, 0.74);
-      font-size: 13px;
+    .stage-desc {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.6;
+      margin: 0 0 20px;
     }
 
-    .error-text { color: var(--danger); }
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(120, 183, 255, 0.16);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #2f8cff, #78b7ff);
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+
+    .modal-small {
+      color: rgba(169, 186, 211, 0.74);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .modal-error {
+      color: var(--danger);
+    }
 
     @media (max-width: 520px) {
-      .card { padding: 36px 22px; }
-      p { font-size: 16px; }
+      .card {
+        padding: 36px 22px;
+      }
+
+      p {
+        font-size: 16px;
+      }
+
+      .modal-header,
+      .modal-body {
+        padding: 20px;
+      }
     }
   </style>
 </head>
@@ -229,137 +294,207 @@
   <main class="wrap">
     <section class="card">
       <div class="logo">FB</div>
+
       <div class="eyebrow">Temporary Maintenance</div>
+
       <h1>Fare Brothers is currently offline</h1>
-      <p id="mainReasonText">
+
+      <p>
         The Fare Brothers website is currently down while we upgrade our electrical infrastructure.
+        We are hoping to have everything back up and running shortly.
       </p>
-      <button class="status" id="statusButton" type="button" aria-haspopup="dialog">
+
+      <button class="status" id="openStatusModal" type="button" aria-haspopup="dialog">
         <span class="dot"></span>
-        <span id="statusButtonText">Upgrade In Progress</span>
+        Upgrade In Progress
       </button>
+
       <div class="notice">
         Please check back again soon, or email us at
         <a href="mailto:support@farebros.com">support@farebros.com</a>.
       </div>
     </section>
 
-    <footer>&copy; 2026 Fare Brothers. All rights reserved.</footer>
+    <footer>
+      &copy; 2026 Fare Brothers. All rights reserved.
+    </footer>
   </main>
 
   <div class="modal-backdrop" id="statusModal" role="dialog" aria-modal="true" aria-labelledby="statusModalTitle">
     <div class="modal">
       <div class="modal-header">
         <div class="modal-title" id="statusModalTitle">Upgrade Status</div>
-        <button class="modal-close" id="closeModal" type="button" aria-label="Close status popup">&times;</button>
+        <button class="modal-close" id="closeStatusModal" type="button" aria-label="Close status popup">&times;</button>
       </div>
+
       <div class="modal-body">
-        <div class="stage-pill"><span class="dot"></span><span id="modalCode">Status</span></div>
-        <h2 class="stage-title" id="modalStatusTitle">Loading status...</h2>
-        <p class="stage-message" id="modalStatusMessage">Checking the latest maintenance update.</p>
-        <div class="last-updated" id="lastUpdated">Fetching status-config.json...</div>
+        <div class="stage-pill">
+          <span class="dot"></span>
+          <span id="stageLabel">Checking status...</span>
+        </div>
+
+        <h2 class="stage-title" id="stageTitle">Checking upgrade progress</h2>
+
+        <p class="stage-desc" id="stageDescription">
+          Pulling the latest status update now.
+        </p>
+
+        <div class="progress-track" aria-hidden="true">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div class="modal-small" id="statusUpdated">
+          Status refreshes from GitHub when this popup opens.
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    const CONFIG_URL = "status-config.json";
+    const STATUS_FILE_URL = "https://raw.githubusercontent.com/Great-Lakes-IT/Website_down/New-Website_Down/status";
 
-    const FALLBACK_CONFIG = {
-      reason: "electrical infrastructure",
-      activeStatus: "0",
-      statuses: {
-        "0": { label: "Upgrades in progress", detail: "Our upgrade work has started and the website is temporarily offline." }
+    const statusMap = {
+      "0": {
+        label: "Upgrades in progress",
+        title: "Upgrades in progress",
+        description: "Maintenance has started. Our systems are offline while the infrastructure upgrade is underway.",
+        progress: 10
+      },
+      "1": {
+        label: "Stage 1",
+        title: "Stage 1: Site safely offline",
+        description: "The website is offline and protected while the electrical infrastructure work begins.",
+        progress: 25
+      },
+      "2": {
+        label: "Stage 2",
+        title: "Stage 2: Infrastructure work underway",
+        description: "Core upgrade work is in progress. Some services may remain unavailable while this stage is completed.",
+        progress: 45
+      },
+      "3": {
+        label: "Stage 3",
+        title: "Stage 3: Systems coming back online",
+        description: "Infrastructure work is wrapping up and systems are being brought back online carefully.",
+        progress: 65
+      },
+      "4": {
+        label: "Stage 4",
+        title: "Stage 4: Testing and verification",
+        description: "We are checking services, confirming stability, and making sure everything is ready before reopening the website.",
+        progress: 85
+      },
+      "5": {
+        label: "Final checks",
+        title: "Final checks",
+        description: "The upgrade is nearly complete. We are doing final checks before the website is restored.",
+        progress: 95
+      },
+      "6": {
+        label: "Complete",
+        title: "Upgrade complete",
+        description: "The upgrade is complete. The website should be returning shortly.",
+        progress: 100
       }
     };
 
-    let currentConfig = FALLBACK_CONFIG;
+    const openButton = document.getElementById("openStatusModal");
+    const closeButton = document.getElementById("closeStatusModal");
+    const modal = document.getElementById("statusModal");
+    const stageLabel = document.getElementById("stageLabel");
+    const stageTitle = document.getElementById("stageTitle");
+    const stageDescription = document.getElementById("stageDescription");
+    const progressBar = document.getElementById("progressBar");
+    const statusUpdated = document.getElementById("statusUpdated");
 
-    const mainReasonText = document.getElementById("mainReasonText");
-    const statusButton = document.getElementById("statusButton");
-    const statusButtonText = document.getElementById("statusButtonText");
-    const statusModal = document.getElementById("statusModal");
-    const closeModal = document.getElementById("closeModal");
-    const modalCode = document.getElementById("modalCode");
-    const modalStatusTitle = document.getElementById("modalStatusTitle");
-    const modalStatusMessage = document.getElementById("modalStatusMessage");
-    const lastUpdated = document.getElementById("lastUpdated");
-
-    function normalizeReason(reason) {
-      return String(reason || "maintenance").trim();
+    function openModal() {
+      modal.classList.add("show");
+      document.body.style.overflow = "hidden";
+      closeButton.focus();
+      loadStatus();
     }
 
-    function applyConfig(config) {
-      currentConfig = config || FALLBACK_CONFIG;
-      const reason = normalizeReason(currentConfig.reason);
-      const status = getCurrentStatus(currentConfig);
-
-      mainReasonText.textContent = `The Fare Brothers website is currently down while we upgrade our ${reason}.`;
-      statusButtonText.textContent = status.label || "Upgrade In Progress";
+    function closeModal() {
+      modal.classList.remove("show");
+      document.body.style.overflow = "";
+      openButton.focus();
     }
 
-    function getCurrentStatus(config) {
-      const code = String(config.activeStatus ?? "0");
-      const status = config.statuses && config.statuses[code] ? config.statuses[code] : null;
-      return status || { label: "Upgrade In Progress", detail: "Maintenance status is currently unavailable." };
+    function setStatus(data, rawValue) {
+      stageLabel.textContent = data.label;
+      stageTitle.textContent = data.title;
+      stageDescription.textContent = data.description;
+      progressBar.style.width = data.progress + "%";
+      statusUpdated.classList.remove("modal-error");
+      statusUpdated.textContent = "Latest GitHub status value: " + rawValue + " • Updated " + new Date().toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit"
+      });
     }
 
-    async function fetchConfig() {
-      const res = await fetch(CONFIG_URL + "?cache=" + Date.now(), { cache: "no-store" });
-      if (!res.ok) throw new Error("Could not load status-config.json");
-      return await res.json();
+    function setError() {
+      stageLabel.textContent = "Status unavailable";
+      stageTitle.textContent = "Unable to load live status";
+      stageDescription.textContent = "The upgrade is still in progress, but the live GitHub status file could not be reached right now.";
+      progressBar.style.width = "10%";
+      statusUpdated.classList.add("modal-error");
+      statusUpdated.textContent = "Try again in a moment.";
     }
 
-    async function refreshConfig() {
+    async function loadStatus() {
+      stageLabel.textContent = "Checking status...";
+      stageTitle.textContent = "Checking upgrade progress";
+      stageDescription.textContent = "Pulling the latest status update now.";
+      progressBar.style.width = "0%";
+      statusUpdated.classList.remove("modal-error");
+      statusUpdated.textContent = "Status refreshes from GitHub when this popup opens.";
+
       try {
-        const config = await fetchConfig();
-        applyConfig(config);
-        return config;
+        const response = await fetch(STATUS_FILE_URL + "?v=" + Date.now(), {
+          cache: "no-store"
+        });
+
+        if (!response.ok) {
+          throw new Error("Status file request failed.");
+        }
+
+        const rawStatus = (await response.text()).trim();
+
+        if (statusMap[rawStatus]) {
+          setStatus(statusMap[rawStatus], rawStatus);
+          return;
+        }
+
+        if (rawStatus.length > 0) {
+          setStatus({
+            label: "Custom update",
+            title: "Current upgrade update",
+            description: rawStatus,
+            progress: 50
+          }, rawStatus);
+          return;
+        }
+
+        setError();
       } catch (error) {
-        applyConfig(FALLBACK_CONFIG);
-        throw error;
+        setError();
       }
     }
 
-    async function openStatusModal() {
-      statusModal.classList.add("show");
-      modalCode.textContent = "Checking";
-      modalStatusTitle.textContent = "Loading status...";
-      modalStatusMessage.textContent = "Checking the latest maintenance update.";
-      lastUpdated.textContent = "Fetching status-config.json...";
-      lastUpdated.classList.remove("error-text");
+    openButton.addEventListener("click", openModal);
+    closeButton.addEventListener("click", closeModal);
 
-      try {
-        const config = await refreshConfig();
-        const code = String(config.activeStatus ?? "0");
-        const status = getCurrentStatus(config);
-        modalCode.textContent = `Code ${code}`;
-        modalStatusTitle.textContent = status.label || "Upgrade In Progress";
-        modalStatusMessage.textContent = status.detail || "No additional details are available right now.";
-        lastUpdated.textContent = `Updated from status-config.json at ${new Date().toLocaleString()}`;
-      } catch (error) {
-        modalCode.textContent = "Offline";
-        modalStatusTitle.textContent = "Status unavailable";
-        modalStatusMessage.textContent = "We could not load the latest status, but maintenance is still in progress.";
-        lastUpdated.textContent = "Unable to fetch status-config.json. Check that it exists in the same GitHub folder as this page.";
-        lastUpdated.classList.add("error-text");
+    modal.addEventListener("click", function (event) {
+      if (event.target === modal) {
+        closeModal();
       }
-    }
-
-    function closeStatusModal() {
-      statusModal.classList.remove("show");
-    }
-
-    statusButton.addEventListener("click", openStatusModal);
-    closeModal.addEventListener("click", closeStatusModal);
-    statusModal.addEventListener("click", (event) => {
-      if (event.target === statusModal) closeStatusModal();
-    });
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") closeStatusModal();
     });
 
-    refreshConfig().catch(() => {});
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && modal.classList.contains("show")) {
+        closeModal();
+      }
+    });
   </script>
 </body>
 </html>
