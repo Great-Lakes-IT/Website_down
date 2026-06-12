@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Fare Brothers | Maintenance</title>
 
   <style>
@@ -263,13 +266,56 @@
   </div>
 
   <script>
-    const CONFIG_URL = "status-config.json";
+    const CONFIG_VERSION = "2026-06-12-v3";
+
+    const CONFIG_URLS = [
+      "status-config.json",
+      "./status-config.json",
+      "https://raw.githubusercontent.com/Great-Lakes-IT/Website_down/New-Website_Down/status-config.json"
+    ];
 
     const FALLBACK_CONFIG = {
-      reason: "electrical infrastructure",
-      activeStatus: "0",
+      reason: "electrical grid upgrade",
+      activeStatus: "90",
+      plannedStart: "2026-06-13T22:00:00-04:00",
+      plannedEnd: "2026-06-14T08:00:00-04:00",
       statuses: {
-        "0": { label: "Upgrades in progress", detail: "Our upgrade work has started and the website is temporarily offline." }
+        "99": {
+          label: "No active outage",
+          detail: "There are no active maintenance events at this time. If you are seeing this page, the main website may be temporarily unreachable or DNS may still be updating."
+        },
+        "90": {
+          label: "Planned outage",
+          detail: "Fare Brothers has a planned outage for an electrical grid upgrade from June 13 at 10:00 PM until June 14 at 8:00 AM."
+        },
+        "0": {
+          label: "Upgrades in progress",
+          detail: "Maintenance has started. Systems are being taken offline safely."
+        },
+        "1": {
+          label: "Stage 1",
+          detail: "Core systems are offline and upgrade work is beginning."
+        },
+        "2": {
+          label: "Stage 2",
+          detail: "Electrical and server infrastructure work is underway."
+        },
+        "3": {
+          label: "Stage 3",
+          detail: "Systems are being brought back online."
+        },
+        "4": {
+          label: "Stage 4",
+          detail: "Testing and verification is in progress."
+        },
+        "5": {
+          label: "Final checks",
+          detail: "Most work is complete. Final checks are being completed before the website returns."
+        },
+        "6": {
+          label: "Complete",
+          detail: "Maintenance is complete and normal service should be returning."
+        }
       }
     };
 
@@ -289,25 +335,51 @@
       return String(reason || "maintenance").trim();
     }
 
-    function applyConfig(config) {
-      currentConfig = config || FALLBACK_CONFIG;
-      const reason = normalizeReason(currentConfig.reason);
-      const status = getCurrentStatus(currentConfig);
-
-      mainReasonText.textContent = `The Fare Brothers website is currently down while we upgrade our ${reason}.`;
-      statusButtonText.textContent = status.label || "Upgrade In Progress";
+    function activeCode(config) {
+      return String(config.activeStatus ?? config.currentStatus ?? "0");
     }
 
     function getCurrentStatus(config) {
-      const code = String(config.activeStatus ?? "0");
+      const code = activeCode(config);
       const status = config.statuses && config.statuses[code] ? config.statuses[code] : null;
       return status || { label: "Upgrade In Progress", detail: "Maintenance status is currently unavailable." };
     }
 
+    function applyConfig(config) {
+      currentConfig = config || FALLBACK_CONFIG;
+      const reason = normalizeReason(currentConfig.reason);
+      const code = activeCode(currentConfig);
+      const status = getCurrentStatus(currentConfig);
+
+      if (code === "99") {
+        mainReasonText.textContent = "There are no active maintenance events right now. If you are seeing this page, the main website may be temporarily unreachable.";
+      } else if (code === "90") {
+        mainReasonText.textContent = `Fare Brothers has a planned outage for a ${reason}.`;
+      } else {
+        mainReasonText.textContent = `The Fare Brothers website is currently down while we upgrade our ${reason}.`;
+      }
+
+      statusButtonText.textContent = status.label || "Upgrade In Progress";
+    }
+
     async function fetchConfig() {
-      const res = await fetch(CONFIG_URL + "?cache=" + Date.now(), { cache: "no-store" });
-      if (!res.ok) throw new Error("Could not load status-config.json");
-      return await res.json();
+      const errors = [];
+
+      for (const url of CONFIG_URLS) {
+        try {
+          const separator = url.includes("?") ? "&" : "?";
+          const res = await fetch(url + separator + "v=" + encodeURIComponent(CONFIG_VERSION) + "&cache=" + Date.now(), {
+            cache: "no-store",
+            headers: { "Cache-Control": "no-cache" }
+          });
+          if (!res.ok) throw new Error(`${url} returned ${res.status}`);
+          return await res.json();
+        } catch (error) {
+          errors.push(error.message);
+        }
+      }
+
+      throw new Error(errors.join(" | "));
     }
 
     async function refreshConfig() {
@@ -331,17 +403,18 @@
 
       try {
         const config = await refreshConfig();
-        const code = String(config.activeStatus ?? "0");
+        const code = activeCode(config);
         const status = getCurrentStatus(config);
         modalCode.textContent = `Code ${code}`;
         modalStatusTitle.textContent = status.label || "Upgrade In Progress";
         modalStatusMessage.textContent = status.detail || "No additional details are available right now.";
         lastUpdated.textContent = `Updated from status-config.json at ${new Date().toLocaleString()}`;
       } catch (error) {
-        modalCode.textContent = "Offline";
-        modalStatusTitle.textContent = "Status unavailable";
-        modalStatusMessage.textContent = "We could not load the latest status, but maintenance is still in progress.";
-        lastUpdated.textContent = "Unable to fetch status-config.json. Check that it exists in the same GitHub folder as this page.";
+        const fallbackStatus = getCurrentStatus(FALLBACK_CONFIG);
+        modalCode.textContent = `Code ${activeCode(FALLBACK_CONFIG)}`;
+        modalStatusTitle.textContent = fallbackStatus.label || "Status unavailable";
+        modalStatusMessage.textContent = fallbackStatus.detail || "We could not load the latest status, so this popup is showing the built-in fallback status.";
+        lastUpdated.textContent = "Unable to fetch status-config.json. Make sure GitHub Pages is serving status-config.json from the same folder as index.html.";
         lastUpdated.classList.add("error-text");
       }
     }

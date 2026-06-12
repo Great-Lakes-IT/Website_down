@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Fare Brothers | Maintenance Admin</title>
   <style>
     :root {
@@ -216,7 +219,7 @@
       </div>
 
       <div class="notice">
-        Static HTML note: this protects the editor from casual visitors, but it is not true server-side security because all code is visible in the browser.
+        Note: This "admin" portal does nothing but creates a new .json file. So hacking into this would be pointless.. enjoy.
       </div>
 
       <form id="loginForm">
@@ -249,7 +252,7 @@
       </div>
 
       <div class="notice">
-        Because this is only HTML on GitHub Pages, the Save button stores changes in this browser only. To update the public website for everyone, click <strong>Download status-config.json</strong> and commit/replace that file in GitHub.
+        Because this is only HTML on GitHub Pages, the Save button stores changes in this browser only. To update the public website for everyone, click <strong>Download status-config.json</strong> and commit/replace that file in GitHub. If GitHub still shows the old status after upload, hard refresh the public page or wait a minute for GitHub Pages/CDN cache.
       </div>
 
       <section class="card">
@@ -264,6 +267,25 @@
             <label for="activeStatusSelect">Current Status</label>
             <select id="activeStatusSelect"></select>
           </div>
+        </div>
+
+        <div class="grid">
+          <div class="field">
+            <label for="plannedStartInput">Planned Start</label>
+            <input id="plannedStartInput" placeholder="2026-06-13T22:00:00-04:00" />
+            <p class="small">Used for code 90 planned outage messaging.</p>
+          </div>
+          <div class="field">
+            <label for="plannedEndInput">Planned End</label>
+            <input id="plannedEndInput" placeholder="2026-06-14T08:00:00-04:00" />
+            <p class="small">Used for code 90 planned outage messaging.</p>
+          </div>
+        </div>
+
+        <div class="btn-row" style="margin-bottom: 14px;">
+          <button type="button" class="ghost" data-quick-status="99">Set 99: No Outage</button>
+          <button type="button" class="ghost" data-quick-status="90">Set 90: Planned Outage</button>
+          <button type="button" class="ghost" data-quick-status="0">Set 0: In Progress</button>
         </div>
 
         <div class="preview">
@@ -290,6 +312,7 @@
           <button id="saveBtn" class="primary" type="button">Save In This Browser</button>
           <button id="downloadBtn" type="button">Download status-config.json</button>
           <button id="copyBtn" type="button">Copy JSON</button>
+          <button id="clearLocalBtn" type="button">Clear Browser Draft</button>
           <button id="resetBtn" class="danger" type="button">Reset Defaults</button>
         </div>
         <div id="adminMessage" class="message ok"></div>
@@ -302,18 +325,49 @@
     const PASSWORD_HASH = "b533449b4280babdc9efffe0e8cc126793d3fd0b302f0453c267e705caa6b990"; // FareBrothers2026!
 
     const DEFAULT_CONFIG = {
-      reason: "electrical infrastructure",
-      activeStatus: "0",
-      statuses: {
-        "0": { label: "Upgrades in progress", detail: "Our upgrade work has started and the website is temporarily offline." },
-        "1": { label: "Stage 1: Site safely offline", detail: "The website has been safely taken offline while work begins." },
-        "2": { label: "Stage 2: Infrastructure work underway", detail: "Electrical and server infrastructure work is currently in progress." },
-        "3": { label: "Stage 3: Systems coming back online", detail: "Core systems are being powered back on and checked." },
-        "4": { label: "Stage 4: Testing and verification", detail: "We are testing the site and verifying everything is stable." },
-        "5": { label: "Final checks", detail: "Final checks are being completed before the site returns." },
-        "6": { label: "Complete", detail: "Maintenance is complete. The main website should be returning shortly." }
+      "reason": "electrical grid upgrade",
+      "activeStatus": "90",
+      "plannedStart": "2026-06-13T22:00:00-04:00",
+      "plannedEnd": "2026-06-14T08:00:00-04:00",
+      "statuses": {
+            "99": {
+                  "label": "No active outage",
+                  "detail": "There are no active maintenance events at this time. If you are seeing this page, the main website may be temporarily unreachable or DNS may still be updating."
+            },
+            "90": {
+                  "label": "Planned outage",
+                  "detail": "Fare Brothers has a planned outage for an electrical grid upgrade from June 13 at 10:00 PM until June 14 at 8:00 AM."
+            },
+            "0": {
+                  "label": "Upgrades in progress",
+                  "detail": "Maintenance has started. Systems are being taken offline safely."
+            },
+            "1": {
+                  "label": "Stage 1",
+                  "detail": "Core systems are offline and upgrade work is beginning."
+            },
+            "2": {
+                  "label": "Stage 2",
+                  "detail": "Electrical and server infrastructure work is underway."
+            },
+            "3": {
+                  "label": "Stage 3",
+                  "detail": "Systems are being brought back online."
+            },
+            "4": {
+                  "label": "Stage 4",
+                  "detail": "Testing and verification is in progress."
+            },
+            "5": {
+                  "label": "Final checks",
+                  "detail": "Most work is complete. Final checks are being completed before the website returns."
+            },
+            "6": {
+                  "label": "Complete",
+                  "detail": "Maintenance is complete and normal service should be returning."
+            }
       }
-    };
+};
 
     let config = structuredClone(DEFAULT_CONFIG);
 
@@ -324,6 +378,9 @@
     const adminMessage = document.getElementById("adminMessage");
     const reasonInput = document.getElementById("reasonInput");
     const activeStatusSelect = document.getElementById("activeStatusSelect");
+    const plannedStartInput = document.getElementById("plannedStartInput");
+    const plannedEndInput = document.getElementById("plannedEndInput");
+    const STORAGE_KEY = "fbMaintenanceConfigV2";
     const reasonPreview = document.getElementById("reasonPreview");
     const statusPreview = document.getElementById("statusPreview");
     const statusList = document.getElementById("statusList");
@@ -357,7 +414,7 @@
     }
 
     async function loadConfig() {
-      const saved = localStorage.getItem("fbMaintenanceConfig");
+      const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         try {
           config = JSON.parse(saved);
@@ -377,11 +434,18 @@
     }
 
     function getSortedCodes() {
-      return Object.keys(config.statuses || {}).sort((a, b) => Number(a) - Number(b));
+      return Object.keys(config.statuses || {}).sort((a, b) => {
+        const specialOrder = { "99": -2, "90": -1 };
+        const av = Object.prototype.hasOwnProperty.call(specialOrder, a) ? specialOrder[a] : Number(a);
+        const bv = Object.prototype.hasOwnProperty.call(specialOrder, b) ? specialOrder[b] : Number(b);
+        return av - bv;
+      });
     }
 
     function renderAdmin() {
       reasonInput.value = config.reason || "";
+      plannedStartInput.value = config.plannedStart || "";
+      plannedEndInput.value = config.plannedEnd || "";
       renderStatusSelect();
       renderStatusList();
       updatePreview();
@@ -431,9 +495,19 @@
 
     function updatePreview() {
       config.reason = reasonInput.value.trim() || "maintenance";
+      config.plannedStart = plannedStartInput.value.trim();
+      config.plannedEnd = plannedEndInput.value.trim();
       config.activeStatus = activeStatusSelect.value;
       const current = config.statuses[config.activeStatus] || { label: "Status unavailable", detail: "No status details are available right now." };
-      reasonPreview.textContent = `The Fare Brothers website is currently down while we upgrade our ${config.reason}.`;
+
+      if (String(config.activeStatus) === "99") {
+        reasonPreview.textContent = "There are no active maintenance events right now.";
+      } else if (String(config.activeStatus) === "90") {
+        reasonPreview.textContent = `Fare Brothers has a planned outage for a ${config.reason}.`;
+      } else {
+        reasonPreview.textContent = `The Fare Brothers website is currently down while we upgrade our ${config.reason}.`;
+      }
+
       statusPreview.textContent = `${config.activeStatus} - ${current.label}: ${current.detail}`;
     }
 
@@ -462,7 +536,7 @@
     function saveLocal() {
       collectStatusEdits();
       updatePreview();
-      localStorage.setItem("fbMaintenanceConfig", JSON.stringify(config, null, 2));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(config, null, 2));
       renderAdmin();
       showMessage(adminMessage, "Saved in this browser. Download the JSON file to update GitHub for everyone.", "ok");
     }
@@ -491,9 +565,10 @@
 
     function addStatus() {
       collectStatusEdits();
+      const codes = getSortedCodes().map(Number).filter(n => !Number.isNaN(n) && n < 90);
       let nextCode = 0;
-      const codes = getSortedCodes().map(Number).filter(n => !Number.isNaN(n));
       if (codes.length) nextCode = Math.max(...codes) + 1;
+      while (config.statuses[String(nextCode)]) nextCode++;
       config.statuses[String(nextCode)] = {
         label: `Stage ${nextCode}`,
         detail: "Add status details here."
@@ -514,7 +589,7 @@
     function resetDefaults() {
       if (!confirm("Reset the editor back to the default maintenance config?")) return;
       config = structuredClone(DEFAULT_CONFIG);
-      localStorage.removeItem("fbMaintenanceConfig");
+      localStorage.removeItem(STORAGE_KEY);
       renderAdmin();
       showMessage(adminMessage, "Defaults restored.", "ok");
     }
@@ -549,12 +624,30 @@
     });
 
     reasonInput.addEventListener("input", updatePreview);
+    plannedStartInput.addEventListener("input", updatePreview);
+    plannedEndInput.addEventListener("input", updatePreview);
     activeStatusSelect.addEventListener("change", updatePreview);
+
+    document.querySelectorAll("[data-quick-status]").forEach(button => {
+      button.addEventListener("click", () => {
+        const code = button.getAttribute("data-quick-status");
+        collectStatusEdits();
+        if (!config.statuses[code]) return;
+        config.activeStatus = code;
+        renderAdmin();
+      });
+    });
     document.getElementById("saveBtn").addEventListener("click", saveLocal);
     document.getElementById("downloadBtn").addEventListener("click", downloadConfig);
     document.getElementById("copyBtn").addEventListener("click", copyConfig);
     document.getElementById("addStatusBtn").addEventListener("click", addStatus);
     document.getElementById("resetBtn").addEventListener("click", resetDefaults);
+    document.getElementById("clearLocalBtn").addEventListener("click", () => {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem("fbMaintenanceConfig");
+      showMessage(adminMessage, "Browser draft cleared. Reloading status-config.json/defaults now.", "ok");
+      loadConfig().then(renderAdmin);
+    });
 
     statusList.addEventListener("click", (e) => {
       const btn = e.target.closest("button[data-delete]");
